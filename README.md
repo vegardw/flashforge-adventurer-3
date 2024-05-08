@@ -16,5 +16,9 @@ The Flashforge Adventurer 3 uses a custom Flashforge flavor of Gcode. There is s
 * [Reddit thread discussing working modifications to Gcode from Prusa Slicer](https://www.reddit.com/r/FlashForge/comments/fxo9z3/prusaslicer_adv_3_settings/)
 * [Official Flashforge document describing how to set up Cura for the Adventurer 3](https://en.fss.flashforge.com/10000/software/59578ec5bff6b5671194cde932f0e99f.pdf)
 
+| Command | Example command | Description | References / Links |
+|-------- |---------------- |------------ |--------------------|
+|         |                 |             |                    |
+
 ## Network protocol
 The printer have a console listening at port 8899 accepting Gcode commands. The FlashPrint software uses this port to transfer gcode and start print, and to receive status during the print.
