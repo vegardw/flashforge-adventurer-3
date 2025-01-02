@@ -1,10 +1,5 @@
 # Miscellaneous information about the Flashforge Adventurer 3 3D printer.
 
-## Prusa Slicer fork
-My repo for trying to create a Prusa Slicer fork with built in support for the Flashforge Gcode flavor:
-
-* [vegardw/PrusaSlicer_ffa3](https://github.com/vegardw/PrusaSlicer_ffa3/)
-
 ## Gcode
 
 ### General
