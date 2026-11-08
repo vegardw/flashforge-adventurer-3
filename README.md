@@ -8,21 +8,19 @@ slicers and software interfaces.
 | Topic | Contents |
 | --- | --- |
 | [Hardware and interfaces](docs/hardware.md) | Linux frontend, motion controller, board variants, UART and peripherals |
+| [MCU variants and factory firmware](docs/mcu-variants.md) | Controller families, update paths and software-identification limits |
 | [Firmware and embedded Linux](docs/firmware.md) | Boot scripts, USB updates, SSH access, firmware components and recovery material |
-| [Slicers and G-code](docs/slicers.md) | OrcaSlicer with stock firmware, Klipper profiles and vendor G-code differences |
-| [Network and control protocols](docs/protocols.md) | Stock TCP console, serial forwarding, Moonraker and diagnostic queries |
+| [Slicers and G-code](docs/slicers.md) | OrcaSlicer stock presets, vendor G-code and file-transfer compatibility |
+| [Network and control protocols](docs/protocols.md) | Stock TCP console, camera stream, framing and diagnostic queries |
 | [Development tools and projects](docs/development.md) | Cross-compilation, framebuffer graphics and useful reference implementations |
 
 ## Where to start
 
 * **Printing with stock firmware:** start with OrcaSlicer's bundled Adventurer 3
   Series profile and the [slicer guide](docs/slicers.md#orcaslicer-with-stock-firmware).
-* **Changing firmware or controlling the MCU:** first identify the board and
-  understand the [Linux/MCU split](docs/hardware.md#system-architecture).
-* **Writing software for the printer:** check the target ABI and
-  [display format](docs/development.md#framebuffer-graphics) before selecting tools.
+* **Firmware and motion control:** the [Linux/MCU architecture](docs/hardware.md#system-architecture)
+  explains the two processors and their responsibilities.
+* **Writing software for the printer:** see the [development tools](docs/development.md)
+  and [display format](docs/development.md#framebuffer-graphics).
 
-Most low-level details here concern the classic MIPS/OpenWrt platform. Check
-board revisions, MCU variants and firmware versions before applying them to a
-Pro 2, a rebrand or another Adventurer model. Individual pages distinguish source
-references and observed behaviour from capabilities that still need testing.
+The low-level Linux details cover the classic MIPS/OpenWrt platform.

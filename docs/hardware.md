@@ -8,8 +8,7 @@ title: Hardware and interfaces
 
 ## System architecture
 
-The classic Adventurer 3 platform separates a Linux frontend from the motion
-controller:
+The Adventurer 3 separates a Linux frontend from the motion controller:
 
 ```text
 Network / USB storage
@@ -21,49 +20,43 @@ Internal UART
 Motion MCU: motors, heaters, fans and sensors
 ```
 
-Installing a Linux application, replacing the display UI and flashing the MCU
-are different operations. A program built for the Linux CPU cannot be flashed
-as motion-controller firmware.
+The Linux frontend runs the display application, network services and update
+tools. The motion MCU runs separate firmware for motors, heaters, fans and
+sensors. Linux applications and motion-controller images target different
+processors.
 
-## Identifying a board
+## Processors and board variants
 
-Record the printer variant, board revision, MCU marking and installed firmware
-before selecting a pin map or image. The [Klippventurer installation guide](https://gitlab.com/synthread/proj/Klippventurer/-/blob/main/docs/installation.md)
-distinguishes MCU vendors and installation paths; its pin maps and support notes
-are a better starting point than assuming that all Adventurer 3-branded boards
-are identical. Treat Pro 2 and rebrands separately until their hardware is known.
+The classic Linux platform uses a little-endian MIPS userspace and the OpenWrt
+`ramips/mt7688` target. The motion controller has several MCU variants, described
+in [MCU variants and factory firmware](mcu-variants.md#controller-families-and-their-role).
+The MCU families use different peripheral layouts and factory update paths.
 
-The classic Linux environment reports `ramips/mt7688` and has a little-endian
-MIPS userspace. That target name is software metadata, not a complete physical
-board identification. Likewise, a compiled Klipper MCU target does not identify
-all compatible chip variants fitted to production boards.
+## Interfaces
 
-## Interfaces relevant to modifications
-
-| Interface | Role and useful distinction |
+| Interface | Role |
 | --- | --- |
-| Ethernet / Wi-Fi | Reach Linux services; the available protocol depends on the running firmware/application |
-| USB storage | Vendor file transfer and boot/update hooks; see [firmware](firmware.md#usb-update-and-script-hook) |
-| Internal UART | Linux-to-motion-controller communication; the documented serial bridge uses `/dev/ttyS1` |
-| Linux framebuffer | `/dev/fb0` exposes display memory; image encoding is described under [development](development.md#framebuffer-graphics) |
-| Touch / camera / other peripherals | Separate drivers and application integration; drawing a framebuffer does not establish working touch or camera support |
+| Ethernet / Wi-Fi | Network connection to the Linux frontend and its services |
+| USB storage | Print-file transfer and boot/update hooks; see [firmware](firmware.md#usb-update-and-script-hook) |
+| Internal UART | Linux-to-motion-controller communication through `/dev/ttyS1` |
+| Linux framebuffer | `/dev/fb0` exposes display memory; see [display format](development.md#framebuffer-graphics) |
+| Touch input and camera | Linux drivers and frontend application integration |
 
-For a direct UART or programmer connection, check the actual header pinout,
-logic levels and power arrangement against the board revision. A Linux device
-name or GPIO number is not a connector pin number. Power down and disconnect
-mains before opening the printer or changing wiring.
+Disconnect mains power before opening the printer or changing wiring.
 
-The [modified vendor boot script](https://github.com/vegardw/ffa3_ssh_installer/blob/9a6bba5550a56c7030b9495b290f2756684013e7/usb_stick/files/opt/auto_run.sh)
-drives GPIO 19 during startup. Its electrical purpose is not established by the
-script alone; it should not be used as an inferred reset/boot pin map.
+## Mechanics and nozzles
 
-## Alternative control arrangements
+The printer is Cartesian: the bed moves on Y, and the toolhead moves on X and Z.
+During homing, the toolhead moves to the top and rightmost position. The nominal
+build volume is 150 × 150 × 150 mm.
 
-Klippventurer documents a direct-wiring approach to an external Klipper host.
-A serial-over-TCP arrangement can instead retain the Linux board as a gateway to
-its existing internal UART. This changes the transport, while the MCU still
-needs suitable firmware. See [the protocol layers](protocols.md#serial-over-tcp).
+The [manufacturer manual](https://en.fss.flashforge.com/10000/software/2ff1e48618315861cfee296866c0392a.pdf)
+describes the mechanics and lists 240 °C and 265 °C nozzle variants.
 
-Per-printer configurations and complete deployment instructions belong with the
-implementation that supplies them. Use this reference to understand interfaces
-and select a compatible approach.
+## Sensors and cooling
+
+The motion controller reads the hotend and bed temperature sensors and drives
+the heater and fan outputs.
+
+All Adventurer 3 printers use a single toolhead fan for both part cooling and
+heatbreak cooling. The fan and air guide direct airflow to both functions.
