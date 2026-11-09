@@ -4,7 +4,7 @@ title: Development tools and projects
 ---
 # Development tools and projects
 
-[Home](../) · [Hardware](hardware.md) · [Firmware](firmware.md)
+[Home](../) · [Hardware](hardware.md) · [Firmware](firmware.md) · [OpenWrt](openwrt.md)
 
 ## Cross-compiling Linux applications
 
@@ -19,10 +19,50 @@ loader. These commands display a binary's format, ELF header and program headers
 file application
 readelf -h application
 readelf -l application
+readelf -d application
 ```
 
 An executable requesting `/lib/ld-uClibc.so.0` requires that target dynamic loader
 and compatible libraries.
+An “existing file not found” error can therefore refer to its missing interpreter.
+The dynamic section lists needed shared libraries; it does not by itself prove
+that the versions installed on the printer are ABI-compatible.
+
+### SDK packages
+
+The OpenWrt SDK builds Linux userspace applications and `.ipk` packages for this
+ABI. It does not build the motion MCU's program merely because both processors
+are on one board. Its package recipes describe source, dependencies, licence
+and installation paths. `CONFIG_PACKAGE_name=m` selects a package to build as
+a separate installable artifact; it does not include it in a base image or prove
+that a build completed. Installation is handled by
+[opkg or the USB package stage](openwrt.md#installing-a-package).
+
+## Inspecting native programs
+
+`strings` and `readelf` inspect executables as data. Disassembly can recover
+constants and call sequences when source is unavailable. Symbols, relocations
+and architecture-specific details matter: MIPS instructions after a branch or
+call can execute in a delay slot, and stripped binaries may lack function names.
+Adjacent code is not necessarily one function. A named but uncalled routine is
+not evidence that the normal program path executes it.
+
+`strace` records system calls by **running** or attaching to a program. Its `-f`
+option follows children; `-o` saves output, and `-s` controls string truncation.
+Without child following, shell commands launched through `system()` can be
+absent even though the parent shows process creation and waits. Options vary
+with the installed strace version.
+
+Tracing a vendor programming tool can reset or program the MCU. Such a trace
+is not a read-only substitute for static analysis. Saved traces can be inspected
+without replaying their commands. Exit status zero or a success message is also
+insufficient when a tool ignores an underlying error; the
+[stock updater's classification and result handling](mcu-variants.md#marker-files-and-software-classification)
+provides concrete examples.
+
+The [strace manual](https://man7.org/linux/man-pages/man1/strace.1.html) and
+[GNU Binutils documentation](https://sourceware.org/binutils/docs/binutils/)
+describe these development tools.
 
 ## Framebuffer graphics
 

@@ -29,6 +29,25 @@ and available peripherals within a family.
 A mapping from MCU families to production years, serial ranges or printer
 submodels is not documented.
 
+### Exact parts identified on mainboards
+
+The [documented boards](hardware.md#documented-mainboards) identify two concrete
+parts independently of image names or marker files:
+
+- **HK32F103RBT6:** Hangshun Cortex-M3 MCU, 128 KiB program flash, 20 KiB SRAM
+  and a 64-lead LQFP package. The family datasheet specifies operation up to
+  96 MHz; that maximum is not a measurement of the printer's configured clock.
+- **N32G455REL7:** Nations Cortex-M4F MCU, 512 KiB program flash and a 64-lead
+  LQFP package. The FPU provides hardware floating-point arithmetic; the family
+  has different analog peripherals and register definitions from STM32F103.
+
+The HK and N32 datasheets are linked in the
+[pin-definition sources](gpio-and-mcu.md#sources). No exact physical MM32 or
+GD32 part is identified by the software-family associations in this reference.
+The [connection comparison](gpio-and-mcu.md#package-pins-across-mcu-families)
+shows shared LQFP64 reset/boot/UART endpoint positions while retaining the
+distinction between chip pinouts and board routing.
+
 ## Controller update paths
 
 Factory updates separate Linux-side update programs from the MCU images they
@@ -45,6 +64,15 @@ the following selection flow:
 The first accepted IAP protocol wins; this is protocol detection rather than a
 manufacturer-ID comparison. The NA writer sends binary frames, while the MM32
 writer encodes frame bytes as hexadecimal ASCII.
+
+### Reset, boot selection and the IAP flag
+
+The STM/HK ISP path sets Linux GPIO 39 high before pulsing GPIO 19 as reset.
+The IAP tool instead drives a separate GPIO 41 update flag low before resetting
+through GPIO 19, and high in later cleanup/fallback paths. It delegates to the
+ISP tool if the IAP handshakes fail. GPIO 41's physical MCU endpoint is not yet
+documented. The [GPIO guide](gpio-and-mcu.md#stock-programming-controls) explains
+the sequences and their scope.
 
 ### Marker files and software classification
 
@@ -75,8 +103,10 @@ STM/HK firmware shares startup code, with differences in timer selection,
 secondary serial hardware and receive-event handling. NA/LDW also differ in
 GPIO/ADC/UART register layouts, clock programming and floating-point instructions.
 
-The IAP images contain application code linked above the start of flash. The
-MCU-side update protocol and resident-loader layout remain undocumented.
+The reviewed NA/LDW IAP application images begin 64 KiB above the start of flash,
+leaving the lower region outside those images. This is an application layout,
+not an empty-flash programming or recovery procedure. The resident-loader code
+and its complete flash layout remain undocumented.
 
 ## Sources
 
