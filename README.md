@@ -12,7 +12,7 @@ slicers and software interfaces.
 | [MCU variants and factory firmware](docs/mcu-variants.md) | Controller families, update paths and software-identification limits |
 | [Firmware and embedded Linux](docs/firmware.md) | Boot scripts, USB updates, SSH access, firmware components and recovery material |
 | [OpenWrt and package management](docs/openwrt.md) | Linux filesystem, opkg queries, compatible packages, feeds and offline installation |
-| [Slicers and G-code](docs/slicers.md) | OrcaSlicer stock presets, vendor G-code and file-transfer compatibility |
+| [Slicers and G-code](docs/slicers.md) | OrcaSlicer, Cura, FlashPrint, vendor G-code quirks and file transfer |
 | [Network and control protocols](docs/protocols.md) | Stock TCP console, camera stream, framing and diagnostic queries |
 | [Development tools and projects](docs/development.md) | Cross-compilation, framebuffer graphics and useful reference implementations |
 
