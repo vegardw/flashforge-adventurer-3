@@ -67,7 +67,9 @@ describe these development tools.
 ## Framebuffer graphics
 
 [png2ffa3fb](https://github.com/vegardw/png2ffa3fb) documents and implements the
-raw image layout used for the classic Adventurer 3 display:
+following raw image encoding for the classic Adventurer 3's 240 × 320 display.
+It describes the converter's output format, not a guarantee of the active Linux
+framebuffer mode:
 
 | Property | Converter format |
 | --- | --- |
@@ -81,6 +83,14 @@ The decoder expands each five-bit colour channel by shifting left three, giving
 values from 0 to 248 in steps of eight. Encoding composites RGBA input onto white
 and sets the one-bit alpha field. This format differs from RGB565 despite using
 the same number of bytes per pixel.
+
+The active framebuffer format is runtime-reported. A query on one classic system
+reported little-endian RGB565 (`R11/5 G5/6 B0/5 A0/0`), which is not compatible
+with the converter's RGBA5551 output. This single observation does not establish
+the mode on every firmware or device. Check the runtime channel fields, geometry,
+row stride and offsets before interpreting raw framebuffer bytes. The converter's
+180-degree transform is also its own image operation, not a framebuffer mode
+setting.
 
 In [converter revision 78f82dc](https://github.com/vegardw/png2ffa3fb/blob/78f82dc085bddfbcedf031ac0c34ff088c0ec6d1/png2ffa3fb.py),
 encoding with NumPy 2.2.4 loses high colour bits because channel shifts retain
