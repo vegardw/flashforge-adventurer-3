@@ -11,13 +11,15 @@ title: Network and control protocols
 | Service | Endpoint | What it carries |
 | --- | --- | --- |
 | Flashforge console | TCP 8899 | Vendor control/status commands and print-file transfer |
-| Legacy printer discovery | UDP multicast `225.0.0.9:8899` | Printer announcements on the local network |
+| Legacy printer discovery | UDP multicast `225.0.0.9:8899` | Probe/response discovery on the local network |
 | Optional camera stream | TCP 8080 | MJPEG video |
 
-The Adventurer 3 uses the legacy discovery protocol, not the newer Flashforge
-HTTP API. The community
+The Adventurer 3 answers the legacy discovery protocol: a client sends any UDP
+packet to the multicast group, and the printer replies. Newer Flashforge models
+use a different discovery packet and an HTTP API that the Adventurer 3 lacks. The
+community
 [discovery reference](https://github.com/Parallel-7/flashforge-api-docs/wiki/Discovery-Protocol)
-describes a 140-byte response with the machine name, command port, product
+describes the 140-byte reply with the machine name, command port, product
 identifiers and status, but no serial number. Retrieve the serial number over
 TCP with `~M115`. The reference documents packet layouts and parsing details;
 they are not duplicated here.

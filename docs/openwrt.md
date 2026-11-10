@@ -32,9 +32,11 @@ cat /proc/mtd
 df -h
 ```
 
-The eMMC layout documented here has writable ext4 system and data filesystems. It does
-not use the read-only SquashFS plus writable overlay arrangement common on
-OpenWrt routers. The `/rom` directory alone is not a copy of the original system.
+The eMMC layout documented here has writable ext4 system and data filesystems:
+the kernel command line mounts `/dev/mmcblk0p1` as `/`, and `/dev/mmcblk0p2` is
+mounted at `/data`. It does not use the read-only SquashFS plus writable overlay
+arrangement common on OpenWrt routers. The `/rom` directory alone is not a copy
+of the original system.
 
 | Location | Purpose |
 | --- | --- |
@@ -46,8 +48,11 @@ OpenWrt routers. The `/rom` directory alone is not a copy of the original system
 | `/root` | Root account's home; also used for controller-classification markers |
 | `/tmp` | RAM-backed temporary storage, lost at reboot |
 
-MTD flash partitions and eMMC block devices are distinct storage resources.
-The [backup overview](firmware.md#backups-and-recovery-material) explains their
+MTD flash partitions and eMMC block devices are distinct storage resources. The
+separate NOR flash reports `u-boot`, `u-boot-env`, `factory`, `firmware`, `kernel`,
+`rootfs` and `rootfs_data` partitions in `/proc/mtd`; the running root filesystem
+is nevertheless the eMMC partition above. The
+[backup overview](firmware.md#backups-and-recovery-material) explains their
 different contents. System-file and package changes on the ext4 root survive
 reboots. USB installers can separately copy additional files into that hierarchy.
 
@@ -78,11 +83,18 @@ They do not establish that a tool was supplied by Flashforge, and an
 A feed is an index of packages available for a particular OpenWrt build.
 
 Use the release, architecture and userspace ABI together when selecting an
-archive. Historical packages are available in the
-[OpenWrt Chaos Calmer archive](https://archive.openwrt.org/chaos_calmer/15.05.1/ramips/mt7620/packages/).
-That archive's path names a build target; its `ramips_24kec` package labels
-identify the userspace architecture. The matching architecture label is necessary
-but does not establish every library or kernel dependency.
+archive. The printer's own `distfeeds.conf` names the `ramips/mt7688` target,
+whose historical packages are in the
+[OpenWrt Chaos Calmer archive](https://archive.openwrt.org/chaos_calmer/15.05.1/ramips/mt7688/packages/).
+Its `ramips_24kec` package labels identify the userspace architecture. The
+matching architecture label is necessary but does not establish every library
+or kernel dependency.
+
+The stock feed lines use `http://downloads.openwrt.org/chaos_calmer/...` URLs.
+Those addresses now answer with a permanent redirect to the HTTPS archive, so
+`opkg update` depends on a download tool that can follow the redirect and
+complete a modern TLS connection. If the printer cannot fetch over HTTPS,
+download the packages on another computer and install them offline as below.
 
 Linux applications require compatible uClibc libraries and the expected dynamic
 loader. Kernel modules additionally require the vendor kernel's matching build

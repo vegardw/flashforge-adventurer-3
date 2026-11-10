@@ -9,8 +9,11 @@ title: Development tools and projects
 ## Cross-compiling Linux applications
 
 The classic OpenWrt platform uses a little-endian MIPS userspace. Its reference
-SDK is OpenWrt 15.05.1 with GCC 4.8 Linaro, uClibc 0.9.33.2 and a
-`mipsel_24kec+dsp` toolchain, supplied as Linux-host binaries.
+SDK is the OpenWrt 15.05.1 `ramips/mt7688` SDK with GCC 4.8 Linaro, uClibc
+0.9.33.2 and a `mipsel_24kec+dsp` toolchain, supplied as x86-64 Linux-host
+binaries. The
+[archived SDK](https://archive.openwrt.org/chaos_calmer/15.05.1/ramips/mt7688/OpenWrt-SDK-15.05.1-ramips-mt7688_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64.tar.bz2)
+matches the target named in the printer's package feeds.
 
 The executable ABI includes the CPU architecture, endianness, libc and dynamic
 loader. These commands display a binary's format, ELF header and program headers:

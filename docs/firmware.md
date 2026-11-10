@@ -65,13 +65,30 @@ software findings from component markings and package pin definitions.
 
 ## USB update and script hook
 
-The [USB startup script](https://github.com/vegardw/ffa3_ssh_installer/blob/9a6bba5550a56c7030b9495b290f2756684013e7/usb_stick/files/opt/auto_run.sh)
-looks for FAT-formatted USB storage and matching `Adventurer3*.tgz` update bundles.
-It also supports a standalone `flashforge_init.sh` hook. The update bundle takes
-priority over the standalone script when both are present.
+The stock startup script, `/opt/auto_run.sh`, runs before the frontend
+application. It tries to mount `/dev/sda1` to `/dev/sda4`, or an unpartitioned
+`/dev/sda`, as FAT (`vfat`), and then checks the mounted stick:
 
-The hook executes installation code as root during startup. This allows a USB
-stick to install software or modify files without using the touchscreen UI.
+1. If any `Adventurer3*.tgz` update bundle exists, the most recently modified
+   one is copied to `/data`, extracted with `tar -xz`, and the bundle's own
+   `flashforge_init.sh` is run. A stick containing a bundle never reaches the
+   standalone hook below, even when the bundle fails.
+2. Otherwise, a `flashforge_init.sh` in the stick's root directory is made
+   executable and run.
+
+Either script runs as root and receives the machine name and product ID
+(`Adventurer3 0008`) as arguments. **If it exits with status 0, the startup
+script then sleeps for 100000 seconds instead of starting the frontend**, so the
+printer must be power-cycled without the stick. A non-zero exit unmounts the
+stick and continues normal startup. This hook lets a USB stick install software
+or modify files without using the touchscreen UI.
+
+After the USB stage, the script drives GPIO 19 high, releasing the
+[motion-MCU reset](gpio-and-mcu.md#stock-programming-controls), and restores the
+Wi-Fi calibration file from the `factory` MTD partition if its header check fails.
+The SSH installer's
+[modified copy](https://github.com/vegardw/ffa3_ssh_installer/blob/9a6bba5550a56c7030b9495b290f2756684013e7/usb_stick/files/opt/auto_run.sh)
+keeps these stock branches and adds optional boot flags.
 
 ## SSH access
 
@@ -149,8 +166,12 @@ the read-only character-device interface, where provided, can be copied with:
 dd if=/dev/mtd2ro of="$backup_dir/mtd2.img" bs=64k
 ```
 
-Here `mtd2` is an example partition number, not a universal name for factory
-data. Preserve its label, size and flash type alongside the image. NOR byte-image
+On the documented MT7688 platform, `mtd2` is the 64 KiB `factory` partition. Its
+start holds the Wi-Fi radio's calibration data: the stock startup script copies
+its first 512 bytes to `/lib/firmware/mt7628.eeprom` when that file is damaged.
+This data is unit-specific, so keep the image private and do not write another
+unit's copy. Check the saved `/proc/mtd` labels before relying on a number, and
+preserve the label, size and flash type alongside the image. NOR byte-image
 examples are not NAND backup instructions: NAND adds bad-block, ECC and
 out-of-band data considerations requiring suitable MTD tooling.
 
