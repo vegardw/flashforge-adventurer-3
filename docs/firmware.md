@@ -8,7 +8,7 @@ title: Firmware and embedded Linux
 
 ## Linux frontend and motion firmware
 
-The classic MIPS platform uses OpenWrt Chaos Calmer 15.05.1 and Linux `3.18.23`.
+The MT7688 platform uses OpenWrt Chaos Calmer 15.05.1 and Linux `3.18.23`.
 The [OpenWrt guide](openwrt.md) covers its filesystem, package management and
 commands for inspecting the installed system.
 

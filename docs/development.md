@@ -8,7 +8,7 @@ title: Development tools and projects
 
 ## Cross-compiling Linux applications
 
-The classic OpenWrt platform uses a little-endian MIPS userspace. Its reference
+The MT7688 platform uses a little-endian MIPS userspace. Its reference
 SDK is the OpenWrt 15.05.1 `ramips/mt7688` SDK with GCC 4.8 Linaro, uClibc
 0.9.33.2 and a `mipsel_24kec+dsp` toolchain, supplied as x86-64 Linux-host
 binaries. The
@@ -69,7 +69,7 @@ describe these development tools.
 
 ## Framebuffer graphics
 
-The classic Adventurer 3's display (`fb_ili9341`) is a 240 × 320 framebuffer at
+The Adventurer 3's display (`fb_ili9341`) is a 240 × 320 framebuffer at
 `/dev/fb0` with this layout:
 
 | Property | Value |

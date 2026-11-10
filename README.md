@@ -25,4 +25,5 @@ slicers and software interfaces.
 * **Writing software for the printer:** see the [development tools](docs/development.md)
   and [display format](docs/development.md#framebuffer-graphics).
 
-The low-level Linux details cover the classic MIPS/OpenWrt platform.
+The Linux details describe the Adventurer 3 with the MediaTek MT7688 board and
+OpenWrt 15.05.1. The Pro 2, rebrands and other Adventurer models may differ.

@@ -27,7 +27,7 @@ processors.
 
 ## Processors and board variants
 
-The classic Linux platform uses a MediaTek **MT7688AN** system-on-chip on a raised
+The Linux platform uses a MediaTek **MT7688AN** system-on-chip on a raised
 module. It runs little-endian MIPS userspace and the OpenWrt `ramips/mt7688`
 target. This Linux processor is separate from the motion MCU. Its operating
 system and package ABI are described in the [OpenWrt guide](openwrt.md).

@@ -8,7 +8,7 @@ title: OpenWrt and package management
 
 ## Platform and filesystem
 
-The classic Adventurer 3 Linux frontend runs OpenWrt Chaos Calmer 15.05.1,
+The Adventurer 3 Linux frontend runs OpenWrt Chaos Calmer 15.05.1,
 revision `r49389`, with Linux `3.18.23`. The MediaTek MT7688AN executes
 little-endian MIPS code. OpenWrt package architecture `ramips_24kec` describes
 this Linux userspace; it says nothing about the separate motion MCU's brand.

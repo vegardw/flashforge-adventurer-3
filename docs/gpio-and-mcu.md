@@ -12,7 +12,7 @@ Linux GPIO numbers refer to the MediaTek MT7688 system. MCU names such as PA9
 refer to motion-controller ports; package pin numbers refer to physical leads.
 These are three different numbering systems.
 
-On the classic MT7688 platform documented here, `/sys/class/tty/ttyS1/device`
+On the MT7688 platform documented here, `/sys/class/tty/ttyS1/device`
 resolves to `10000e00.uart2`. Therefore `/dev/ttyS1` is **hardware UART2**. The tty index
 does not identify the hardware UART number. MT7688 UART2 uses GPIO-capable
 pins 20 for TX and 21 for RX; they operate as serial signals in this mode.
@@ -104,7 +104,7 @@ The image is evidence for its depicted board, not a complete all-variant schemat
 ## Sources
 
 - Factory ISP/IAP program analysis and GPIO-controller/tty-device definitions
-  from the classic Linux platform.
+  from the MT7688 Linux platform.
 - ST [STM32F103xC/D/E datasheet](https://www.st.com/resource/en/datasheet/stm32f103re.pdf),
   Figure 7 and pin definitions.
 - Hangshun's HK32F103x8xB datasheet v1.1.5, Table 5-1, through a
