@@ -69,46 +69,50 @@ describe these development tools.
 
 ## Framebuffer graphics
 
-[png2ffa3fb](https://github.com/vegardw/png2ffa3fb) documents and implements the
-following raw image encoding for the classic Adventurer 3's 240 × 320 display.
-It describes the converter's output format, not a guarantee of the active Linux
-framebuffer mode:
+The classic Adventurer 3's display (`fb_ili9341`) is a 240 × 320 framebuffer at
+`/dev/fb0` with this layout:
 
-| Property | Converter format |
+| Property | Value |
 | --- | --- |
 | Dimensions | 240 × 320 pixels |
-| Storage | 16 bits per pixel; 153600 bytes without a file header |
-| Pixel fields | RGBA5551: R bits 15–11, G 10–6, B 5–1, alpha bit 0 |
+| Storage | 16 bits per pixel, 480-byte rows; 153600 bytes, no header |
+| Pixel fields | RGB565: R bits 15–11, G 10–5, B 4–0, no alpha |
 | Byte order | Little-endian |
-| Orientation | Converter rotates 180° in both directions |
+| Orientation | Mounted upside down: rotate images 180° before writing |
 
-The decoder expands each five-bit colour channel by shifting left three, giving
-values from 0 to 248 in steps of eight. Encoding composites RGBA input onto white
-and sets the one-bit alpha field. This format differs from RGB565 despite using
-the same number of bytes per pixel.
+The driver reports these fields at runtime (`R11/5 G5/6 B0/5 A0/0`), and RGB565
+colour and orientation test charts display correctly on the panel. The
+[Linux framebuffer API](https://www.kernel.org/doc/html/latest/fb/api.html)
+exposes dimensions, row stride, offsets and channel layout through
+`FBIOGET_FSCREENINFO` and `FBIOGET_VSCREENINFO`; the same values appear under
+`/sys/class/graphics/fb0/`. Check them before writing raw bytes on other firmware.
 
-The active framebuffer format is runtime-reported. A query on one classic system
-reported little-endian RGB565 (`R11/5 G5/6 B0/5 A0/0`), which is not compatible
-with the converter's RGBA5551 output. This single observation does not establish
-the mode on every firmware or device. Check the runtime channel fields, geometry,
-row stride and offsets before interpreting raw framebuffer bytes. The converter's
-180-degree transform is also its own image operation, not a framebuffer mode
-setting.
+A raw screen can be saved, replaced and restored from a shell:
 
-In [converter revision 78f82dc](https://github.com/vegardw/png2ffa3fb/blob/78f82dc085bddfbcedf031ac0c34ff088c0ec6d1/png2ffa3fb.py),
-encoding with NumPy 2.2.4 loses high colour bits because channel shifts retain
-eight-bit scalar types. Convert channels to Python integers before bit shifting
-to avoid this overflow. NumPy explains the promotion change in its
-[migration guide](https://numpy.org/doc/2.0/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion).
+```sh
+dd if=/dev/fb0 of=/tmp/saved.img bs=153600 count=1
+cat image.img > /dev/fb0
+cat /tmp/saved.img > /dev/fb0
+```
 
-The [Linux framebuffer API](https://www.kernel.org/doc/html/latest/fb/api.html)
-exposes runtime dimensions, row stride, offsets and channel layout through
-`FBIOGET_FSCREENINFO` and `FBIOGET_VSCREENINFO`. The vendor frontend also draws to
-framebuffer memory, so a replacement renderer shares the same display resource.
+The vendor frontend also draws to framebuffer memory and can overwrite the image
+while it runs, so a replacement renderer shares the same display resource.
+
+[png2ffa3fb](https://github.com/vegardw/png2ffa3fb) converts PNG images to and
+from this format, including the rotation; its repository has the usage details
+and device test charts. Revisions before
+[`f9c62e3`](https://github.com/vegardw/png2ffa3fb/commit/f9c62e3c53bf943e455b80be2c0783ad18c9051a)
+wrote RGBA5551 (green in bits 10–6, an alpha bit in bit 0), which shows shifted
+colours on this display, and lost high colour bits under NumPy 2 because channel
+shifts kept eight-bit scalar types (see NumPy's
+[promotion change](https://numpy.org/doc/2.0/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion)).
+Regenerate images made with those revisions.
 
 [LVGL's Linux framebuffer port](https://github.com/lvgl/lv_port_linux_frame_buffer)
-provides a custom-UI framework with a Linux display backend. Its display driver
-and input initialization are separate components.
+provides a custom-UI framework with a Linux display backend. Its
+[fbdev driver](https://github.com/lvgl/lvgl/blob/master/src/drivers/display/fb/lv_linux_fbdev.c)
+selects RGB565 for any 16-bit framebuffer, which matches this display. Display
+output and touch input are initialized separately.
 [fbgrab](https://github.com/GunnarMonell/fbgrab) is a framebuffer screenshot tool.
 
 ## Reference implementations

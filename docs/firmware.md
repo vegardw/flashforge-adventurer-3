@@ -83,18 +83,34 @@ printer must be power-cycled without the stick. A non-zero exit unmounts the
 stick and continues normal startup. This hook lets a USB stick install software
 or modify files without using the touchscreen UI.
 
+Two consequences matter when writing a hook script:
+
+- A script that reports failure with a non-zero exit lets startup continue, and
+  the frontend then draws over any error screen the script wrote to the
+  [framebuffer](development.md#framebuffer-graphics). To keep an error visible,
+  the script must hold it itself, for example by sleeping before exiting.
+- Files copied from the FAT stick all arrive with the same owner and mode. Set
+  owners and modes explicitly for anything that checks them, such as
+  `authorized_keys` and other SSH files.
+
 After the USB stage, the script drives GPIO 19 high, releasing the
 [motion-MCU reset](gpio-and-mcu.md#stock-programming-controls), and restores the
 Wi-Fi calibration file from the `factory` MTD partition if its header check fails.
 The SSH installer's
-[modified copy](https://github.com/vegardw/ffa3_ssh_installer/blob/9a6bba5550a56c7030b9495b290f2756684013e7/usb_stick/files/opt/auto_run.sh)
+[modified copy](https://github.com/vegardw/ffa3_ssh_installer/blob/28c19e754bc60e8d49eb3ad604b7854b029b1de9/usb_stick/files/opt/auto_run.sh)
 keeps these stock branches and adds optional boot flags.
 
 ## SSH access
 
 [ffa3_ssh_installer](https://github.com/vegardw/ffa3_ssh_installer) adds an SSH
-server and copies configuration files through the USB startup hook. Its repository
-contains the installation instructions and modified startup script.
+server and copies configuration files through the USB startup hook. It requires
+the user's public key, stops at the first failed step, verifies the result and
+writes a step log to the stick. Its repository contains the installation
+instructions and modified startup script.
+
+The SSH server listens on every network the printer is on, including the
+printer's own Wi-Fi access point. Use key-based login and keep that exposure in
+mind when the access point is enabled.
 The [OpenWrt page](openwrt.md#installing-a-package) also covers direct `opkg`
 installation and USB-supplied package installation.
 
